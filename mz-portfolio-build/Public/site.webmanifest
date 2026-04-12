@@ -1,0 +1,16 @@
+{
+  "name": "Mohammed Zidan C — Portfolio",
+  "short_name": "MZ Portfolio",
+  "description": "Portfolio of Mohammed Zidan C, VLSI Engineering Student and Aspiring Chip Designer",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0a0a0a",
+  "theme_color": "#7c3aed",
+  "icons": [
+    {
+      "src": "/favicon.ico",
+      "sizes": "any",
+      "type": "image/x-icon"
+    }
+  ]
+}
