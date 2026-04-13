@@ -105,25 +105,45 @@ export default function ProjectCard({ project, index }: Props) {
           ))}
         </div>
 
-        {/* Source CTA — opens GitHub in new tab */}
-        {project.source && (
-          <a
-            href={project.source}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="project-source-btn inline-flex items-center gap-2 text-xs tracking-widest uppercase px-4 py-2 rounded border"
-            style={{
-              fontFamily: 'var(--font-mono)',
-              fontSize: '0.65rem',
-              color: 'var(--accent-primary)',
-              borderColor: 'rgba(124,58,237,0.35)',
-              background: 'rgba(124,58,237,0.06)',
-            }}
-            aria-label={`View ${project.title} source code on GitHub`}
-          >
-            Source Code ↗
-          </a>
-        )}
+        {/* CTA buttons */}
+        <div className="flex flex-wrap gap-3">
+          {project.source && (
+            <a
+              href={project.source}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="project-source-btn inline-flex items-center gap-2 text-xs tracking-widest uppercase px-4 py-2 rounded border"
+              style={{
+                fontFamily: 'var(--font-mono)',
+                fontSize: '0.65rem',
+                color: 'var(--accent-primary)',
+                borderColor: 'rgba(124,58,237,0.35)',
+                background: 'rgba(124,58,237,0.06)',
+              }}
+              aria-label={`View ${project.title} source code on GitHub`}
+            >
+              Source Code ↗
+            </a>
+          )}
+          {project.live && (
+            <a
+              href={project.live}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="project-source-btn inline-flex items-center gap-2 text-xs tracking-widest uppercase px-4 py-2 rounded border"
+              style={{
+                fontFamily: 'var(--font-mono)',
+                fontSize: '0.65rem',
+                color: 'var(--accent-secondary)',
+                borderColor: 'rgba(6,182,212,0.35)',
+                background: 'rgba(6,182,212,0.06)',
+              }}
+              aria-label={`View ${project.title} live demo`}
+            >
+              Live Demo ↗
+            </a>
+          )}
+        </div>
       </div>
     </div>
   );

@@ -118,6 +118,16 @@ export const projects = [
     live: null,
     featured: false,
   },
+  {
+    title: "Health Advisor AI",
+    year: "2026",
+    description: "A modern medical assistant AI powered by the Google Gemini API. Analyzes patient symptoms, suggests possible conditions, and provides conversational health guidance using natural language processing.",
+    tech: ["HTML/CSS", "JavaScript", "Node.js", "Gemini API", "Vercel"],
+    image: "/Projects/Health_Advisor.png",
+    source: "https://github.com/MohammedZidanC/Health_Advisor",
+    live: "https://health-advisor-eight.vercel.app",
+    featured: true,
+  },
 ];
 
 export const certifications = [

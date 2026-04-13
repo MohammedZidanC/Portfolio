@@ -6,7 +6,7 @@ import { personal, marqueeText } from '@/lib/data';
 
 const STATS = [
   { value: 2024, label: 'Year I started B.Tech', suffix: '' },
-  { value: 4,    label: 'Projects Built',          suffix: '' },
+  { value: 5,    label: 'Projects Built',          suffix: '' },
   { value: 10,   label: 'Certifications Earned',   suffix: '' },
   { value: 1,    label: 'Prize at SRM Innovation',  suffix: 'st 🏆' },
 ];
