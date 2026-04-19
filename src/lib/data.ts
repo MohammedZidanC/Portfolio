@@ -211,6 +211,22 @@ export const certifications = [
     pdf: "/Certifications/ISTE Membership.pdf",
     type: "membership" as const,
   },
+  {
+    title: "Job Readiness & Professional Development Program",
+    issuer: "Coursera",
+    date: "Apr 2026",
+    tags: ["Job Readiness", "Professional Development"],
+    pdf: "/Certifications/Job Readiness & Professional Development Program.pdf",
+    type: "soft" as const,
+  },
+  {
+    title: "Employability Skills Mastery",
+    issuer: "Udemy",
+    date: "Apr 2026",
+    tags: ["Soft Skills", "Employability"],
+    pdf: "/Certifications/Udemy Employability skills Mastery.pdf",
+    type: "soft" as const,
+  },
 ];
 
 export const marqueeText =
