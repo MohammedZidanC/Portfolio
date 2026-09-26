@@ -8,7 +8,7 @@ export const personal = {
   languages: ["English", "Hindi", "Malayalam"],
   email: "mohammedzidanc@gmail.com",
   github: "https://github.com/MohammedZidanC",
-  linkedin: "https://www.linkedin.com/in/mohammed-zidan-c-16a367324",
+  linkedin: "https://www.linkedin.com/in/mohammed-zidan-c/",
   goal: "To evolve into an industry-ready VLSI/RTL Engineer with robust fundamentals and pragmatic design acumen.",
   photo: "/me.png",
 };
