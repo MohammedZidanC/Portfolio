@@ -1,0 +1,155 @@
+.button {
+  position: relative;
+  display: grid;
+  width: 46px;
+  height: 46px;
+  flex: 0 0 46px;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  overflow: visible;
+  background: transparent;
+  box-shadow: none;
+  color: var(--text-primary);
+  perspective: 480px;
+  cursor: pointer;
+  isolation: isolate;
+  transition: border-color .35s ease, background .35s ease, box-shadow .35s ease;
+}
+
+.button:hover {
+  background: transparent;
+  box-shadow: none;
+}
+
+.button:focus-visible {
+  outline: 2px solid var(--accent-primary);
+  outline-offset: 4px;
+}
+
+.mark {
+  position: relative;
+  z-index: 1;
+  width: 37px;
+  height: 37px;
+  overflow: visible;
+  transform-style: preserve-3d;
+  transform-origin: center;
+  animation: idle-turn 8.6s ease-in-out infinite;
+  filter: drop-shadow(0 1px 1px rgba(0,0,0,.65));
+}
+
+.frame {
+  stroke: rgba(216,209,195,.34);
+  stroke-width: .8;
+  fill: rgba(255,255,255,.012);
+  stroke-dasharray: 104;
+  stroke-dashoffset: 0;
+  animation: frame-draw 17s ease-in-out infinite;
+}
+
+.depth,
+.stroke,
+.highlight {
+  stroke-linecap: square;
+  stroke-linejoin: bevel;
+}
+
+.depth {
+  stroke: rgba(0,0,0,.64);
+  stroke-width: 5;
+}
+
+.stroke {
+  stroke: url(#mz-metal);
+  stroke-width: 2.35;
+}
+
+.highlight {
+  stroke: url(#mz-edge);
+  stroke-width: .9;
+  opacity: .76;
+}
+
+.pin {
+  fill: #d8c5a1;
+  filter: drop-shadow(0 0 3px rgba(198,167,121,.55));
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: pin-breathe 4.4s ease-in-out infinite;
+}
+
+.glint {
+  position: absolute;
+  z-index: 2;
+  top: -30%;
+  left: -24%;
+  width: 34%;
+  height: 160%;
+  transform: rotate(28deg);
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,.18), transparent);
+  opacity: 0;
+  pointer-events: none;
+  animation: glint-pass 8.6s 1.4s ease-in-out infinite;
+}
+
+.button[data-scrolled='true'] .mark {
+  animation-name: scroll-tilt;
+  animation-duration: 5.2s;
+}
+
+.button[data-scrolled='true'] .frame {
+  stroke: rgba(216,209,195,.48);
+}
+
+.button[data-clicking='true'] .mark {
+  animation: click-turn .56s cubic-bezier(.2,.8,.2,1) both;
+}
+
+.button[data-clicking='true'] .pin {
+  animation: pin-click .56s cubic-bezier(.2,.8,.2,1) both;
+}
+
+@keyframes idle-turn {
+  0%, 72%, 100% { transform: rotateX(0deg) rotateY(0deg) translateZ(0); }
+  82% { transform: rotateX(-4deg) rotateY(7deg) translateZ(1px); }
+  92% { transform: rotateX(2deg) rotateY(-3deg) translateZ(0); }
+}
+
+@keyframes scroll-tilt {
+  0%, 100% { transform: rotateX(-5deg) rotateY(6deg) translateZ(1px); }
+  50% { transform: rotateX(-2deg) rotateY(2deg) translateZ(0); }
+}
+
+@keyframes click-turn {
+  0% { transform: rotateX(0) rotateY(0) scale(1); }
+  38% { transform: rotateX(18deg) rotateY(-24deg) scale(.86); }
+  100% { transform: rotateX(-4deg) rotateY(7deg) scale(1); }
+}
+
+@keyframes frame-draw {
+  0%, 76%, 100% { stroke-dashoffset: 0; opacity: .7; }
+  88% { stroke-dashoffset: 104; opacity: .42; }
+}
+
+@keyframes pin-breathe {
+  0%, 100% { opacity: .75; transform: scale(.9); }
+  50% { opacity: 1; transform: scale(1.18); }
+}
+
+@keyframes pin-click {
+  0% { transform: scale(1); }
+  42% { transform: scale(1.7); }
+  100% { transform: scale(1); }
+}
+
+@keyframes glint-pass {
+  0%, 76%, 100% { left: -24%; opacity: 0; }
+  81% { opacity: .8; }
+  92% { left: 112%; opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mark, .frame, .pin, .glint { animation: none !important; }
+}

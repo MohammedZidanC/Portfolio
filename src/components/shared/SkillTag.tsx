@@ -41,7 +41,7 @@ export default function SkillTag({ label, color, isCore = false, delay = 0 }: Sk
         style={{
           width: 6, height: 6,
           borderRadius: '50%',
-          background: isCore ? '#f59e0b' : color,
+          background: isCore ? 'var(--accent-primary)' : color,
           display: 'inline-block',
           flexShrink: 0,
         }}

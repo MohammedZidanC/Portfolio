@@ -1,11 +1,14 @@
 'use client';
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import dynamic from 'next/dynamic';
 
 // UI layer
 import Loader         from '@/components/ui/Loader';
 import ScrollProgress from '@/components/ui/ScrollProgress';
 import Navigation     from '@/components/ui/Navigation';
+import ScrollEffects  from '@/components/ui/ScrollEffects';
+import ScrollReactiveBackdrop from '@/components/ui/ScrollReactiveBackdrop';
+import CelestialBackdrop from '@/components/ui/CelestialBackdrop';
 
 // Sections
 import Hero           from '@/components/sections/Hero';
@@ -31,15 +34,24 @@ const NAV_SECTIONS = [
 ];
 
 export default function HomePage() {
-  const [loaderDone, setLoaderDone] = useState(false);
+  const [introPhase, setIntroPhase] = useState<'loading' | 'flight' | 'handoff' | 'ready'>('loading');
+  const [loaderVisible, setLoaderVisible] = useState(true);
+  const startLogoFlight = useCallback(() => setIntroPhase('flight'), []);
+  const landLogo = useCallback(() => setIntroPhase('handoff'), []);
+  const finishLoading = useCallback(() => {
+    setIntroPhase('ready');
+    setLoaderVisible(false);
+  }, []);
 
   return (
     <>
       {/* Noise overlay */}
       <div className="noise-overlay" aria-hidden="true" />
+      <ScrollReactiveBackdrop />
+      <CelestialBackdrop />
 
       {/* Loader — blocks everything until dismissed */}
-      {!loaderDone && <Loader onDone={() => setLoaderDone(true)} />}
+      {loaderVisible && <Loader onFlightStart={startLogoFlight} onMarkLanded={landLogo} onDone={finishLoading} />}
 
       {/* Cursor (desktop only, client only) */}
       <Cursor />
@@ -49,19 +61,21 @@ export default function HomePage() {
 
       {/* Navigation */}
       <Navigation sections={NAV_SECTIONS} />
+      <ScrollEffects />
 
       {/* Main content */}
-      <main>
-        <Hero />
-        <About />
-        <Skills />
-        <Education />
-        <Projects />
-        <Certifications />
-        <Contact />
-      </main>
-
-      <Footer />
+      <div className="site-foreground">
+        <main>
+          <Hero introPhase={introPhase} />
+          <About />
+          <Skills />
+          <Education />
+          <Projects />
+          <Certifications />
+          <Contact />
+        </main>
+        <Footer />
+      </div>
     </>
   );
 }

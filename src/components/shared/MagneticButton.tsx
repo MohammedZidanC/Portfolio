@@ -8,9 +8,10 @@ interface Props {
   onClick?: () => void;
   type?: 'button' | 'submit';
   'aria-label'?: string;
+  style?: React.CSSProperties;
 }
 
-export default function MagneticButton({ children, className = '', href, onClick, type = 'button', 'aria-label': ariaLabel }: Props) {
+export default function MagneticButton({ children, className = '', href, onClick, type = 'button', 'aria-label': ariaLabel, style }: Props) {
   const ref = useRef<HTMLButtonElement & HTMLAnchorElement>(null);
 
   useEffect(() => {
@@ -47,6 +48,7 @@ export default function MagneticButton({ children, className = '', href, onClick
         rel="noopener noreferrer"
         className={`magnetic-btn ${className}`}
         aria-label={ariaLabel}
+        style={style}
       >
         {children}
       </a>
@@ -60,6 +62,7 @@ export default function MagneticButton({ children, className = '', href, onClick
       onClick={onClick}
       className={`magnetic-btn ${className}`}
       aria-label={ariaLabel}
+      style={style}
     >
       {children}
     </button>

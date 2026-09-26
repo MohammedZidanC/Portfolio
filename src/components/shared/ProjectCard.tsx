@@ -1,6 +1,5 @@
 'use client';
 import Image from 'next/image';
-import { useEffect, useRef } from 'react';
 
 interface Project {
   title: string;
@@ -15,40 +14,19 @@ interface Project {
 
 interface Props {
   project: Project;
-  index: number;
 }
 
-export default function ProjectCard({ project, index }: Props) {
-  const ref = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setTimeout(() => {
-            el.classList.add('visible');
-          }, index * 150);
-          observer.disconnect();
-        }
-      },
-      { threshold: 0.1 }
-    );
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, [index]);
-
+export default function ProjectCard({ project }: Props) {
   return (
-    <div ref={ref} className="project-card" aria-label={`Project: ${project.title}`}>
+    <div className="project-card" data-scroll-reveal aria-label={`Project: ${project.title}`}>
       {/* Year badge */}
       <div
         className="absolute top-4 right-4 z-10 text-xs tracking-widest px-2 py-1 rounded border"
         style={{
           fontFamily: 'var(--font-mono)',
           color: 'var(--accent-secondary)',
-          borderColor: 'rgba(6,182,212,0.3)',
-          background: 'rgba(6,182,212,0.06)',
+          borderColor: 'rgba(216,209,195,0.24)',
+          background: 'rgba(216,209,195,0.045)',
         }}
         aria-label={`Year: ${project.year}`}
       >
@@ -117,8 +95,8 @@ export default function ProjectCard({ project, index }: Props) {
                 fontFamily: 'var(--font-mono)',
                 fontSize: '0.65rem',
                 color: 'var(--accent-primary)',
-                borderColor: 'rgba(124,58,237,0.35)',
-                background: 'rgba(124,58,237,0.06)',
+                borderColor: 'rgba(198,167,121,0.35)',
+                background: 'rgba(198,167,121,0.055)',
               }}
               aria-label={`View ${project.title} source code on GitHub`}
             >
@@ -135,8 +113,8 @@ export default function ProjectCard({ project, index }: Props) {
                 fontFamily: 'var(--font-mono)',
                 fontSize: '0.65rem',
                 color: 'var(--accent-secondary)',
-                borderColor: 'rgba(6,182,212,0.35)',
-                background: 'rgba(6,182,212,0.06)',
+                borderColor: 'rgba(216,209,195,0.28)',
+                background: 'rgba(216,209,195,0.045)',
               }}
               aria-label={`View ${project.title} live demo`}
             >

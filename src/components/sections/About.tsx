@@ -6,9 +6,9 @@ import { personal, marqueeText } from '@/lib/data';
 
 const STATS = [
   { value: 2024, label: 'Year I started B.Tech', suffix: '' },
-  { value: 5,    label: 'Projects Built',          suffix: '' },
-  { value: 10,   label: 'Certifications Earned',   suffix: '' },
-  { value: 1,    label: 'Prize at SRM Innovation',  suffix: 'st 🏆' },
+  { value: 7,    label: 'Public Repositories',    suffix: '' },
+  { value: 17,   label: 'Documented Credentials', suffix: '' },
+  { value: 5,    label: 'Core Skill Areas',         suffix: '' },
 ];
 
 function useCountUp(target: number, active: boolean, duration = 1800) {
@@ -38,8 +38,8 @@ function StatCard({ stat, active }: { stat: typeof STATS[0]; active: boolean }) 
         transition: 'border-color 0.3s, box-shadow 0.3s',
       }}
       onMouseEnter={e => {
-        (e.currentTarget as HTMLElement).style.borderColor = 'rgba(124,58,237,0.35)';
-        (e.currentTarget as HTMLElement).style.boxShadow  = '0 0 20px rgba(124,58,237,0.12)';
+        (e.currentTarget as HTMLElement).style.borderColor = 'rgba(198,167,121,0.4)';
+        (e.currentTarget as HTMLElement).style.boxShadow  = '0 0 20px rgba(198,167,121,0.1)';
       }}
       onMouseLeave={e => {
         (e.currentTarget as HTMLElement).style.borderColor = 'var(--border)';
@@ -117,7 +117,7 @@ export default function About() {
               <span
                 style={{
                   width: 8, height: 8, borderRadius: '50%',
-                  background: '#22c55e',
+                  background: 'var(--accent-primary)',
                   display: 'inline-block',
                   animation: 'avail-pulse-green 2s ease-in-out infinite',
                   flexShrink: 0,
@@ -192,6 +192,20 @@ export default function About() {
               </svg>
               {personal.location}
             </p>
+            <p
+              className="mt-3 text-xs"
+              style={{
+                fontFamily: 'var(--font-mono)',
+                color: 'var(--text-muted)',
+                letterSpacing: '0.08em',
+                opacity: bioVisible ? 1 : 0,
+                transition: 'opacity 0.7s ease 1.3s',
+              }}
+            >
+              <span style={{ color: 'var(--accent-secondary)' }}>LANGUAGES</span>
+              <span aria-hidden="true"> &nbsp;·&nbsp; </span>
+              {personal.languages.join(' · ')}
+            </p>
           </div>
 
           {/* Right col 40% */}
@@ -206,7 +220,7 @@ export default function About() {
       {/* Marquee band */}
       <div
         className="w-full border-t border-b py-4 mt-8"
-        style={{ borderColor: 'var(--border)', background: 'rgba(124,58,237,0.03)' }}
+        style={{ borderColor: 'var(--border)', background: 'rgba(198,167,121,0.025)' }}
       >
         <Marquee text={marqueeText} />
         <div className="mt-3">
@@ -216,8 +230,8 @@ export default function About() {
 
       <style>{`
         @keyframes avail-pulse-green {
-          0%, 100% { box-shadow: 0 0 4px #22c55e; }
-          50%       { box-shadow: 0 0 16px #22c55e, 0 0 28px rgba(34,197,94,0.35); }
+          0%, 100% { box-shadow: 0 0 4px #c6a779; }
+          50%       { box-shadow: 0 0 12px #c6a779, 0 0 22px rgba(198,167,121,0.22); }
         }
       `}</style>
     </section>

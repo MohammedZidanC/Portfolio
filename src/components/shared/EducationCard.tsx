@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useRef } from 'react';
+import { useRef } from 'react';
 import Image from 'next/image';
 
 interface EduEntry {
@@ -16,40 +16,20 @@ interface EduEntry {
 
 interface Props {
   entry: EduEntry;
-  index: number;
   side: 'left' | 'right';
 }
 
-export default function EducationCard({ entry, index, side }: Props) {
+export default function EducationCard({ entry, side }: Props) {
   const ref = useRef<HTMLAnchorElement>(null);
-
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    el.classList.add(side === 'left' ? 'from-left' : 'from-right');
-
-    const observer = new IntersectionObserver(
-      ([ent]) => {
-        if (ent.isIntersecting) {
-          setTimeout(() => {
-            el.classList.add('visible');
-          }, 800 + index * 150);
-          observer.disconnect();
-        }
-      },
-      { threshold: 0.15 }
-    );
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, [index, side]);
 
   return (
     <a
       ref={ref}
+      data-scroll-reveal
       href={entry.url}
       target="_blank"
       rel="noopener noreferrer"
-      className="edu-card block relative group"
+      className={`edu-card block relative group from-${side}`}
       aria-label={`${entry.institution} — ${entry.degree}. Click to visit website.`}
     >
       {/* Visit indicator */}
@@ -92,8 +72,8 @@ export default function EducationCard({ entry, index, side }: Props) {
       <div
         className="inline-block text-xs px-2.5 py-1 rounded mb-2"
         style={{
-          background: 'rgba(124,58,237,0.1)',
-          border: '1px solid rgba(124,58,237,0.25)',
+          background: 'rgba(198,167,121,0.08)',
+          border: '1px solid rgba(198,167,121,0.25)',
           color: 'var(--accent-primary)',
           fontFamily: 'var(--font-mono)',
           fontSize: '0.68rem',

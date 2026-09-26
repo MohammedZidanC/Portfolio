@@ -1,5 +1,6 @@
 'use client';
 import { useEffect, useRef, useState } from 'react';
+import SiteLogo from './SiteLogo';
 
 interface Props {
   sections: { id: string; label: string }[];
@@ -9,6 +10,7 @@ export default function Navigation({ sections }: Props) {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [activeSection, setActiveSection] = useState('');
+  const mobileMenuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 50);
@@ -33,6 +35,10 @@ export default function Navigation({ sections }: Props) {
     };
   }, [sections]);
 
+  useEffect(() => {
+    if (mobileMenuRef.current) mobileMenuRef.current.inert = !mobileOpen;
+  }, [mobileOpen]);
+
   const scrollTo = (id: string) => {
     const el = document.getElementById(id);
     if (el) el.scrollIntoView({ behavior: 'smooth' });
@@ -42,32 +48,12 @@ export default function Navigation({ sections }: Props) {
   return (
     <>
       <header
-        className="fixed top-0 left-0 right-0 z-[5000] transition-all duration-300"
-        style={{
-          background: scrolled ? 'rgba(10,10,10,0.85)' : 'transparent',
-          backdropFilter: scrolled ? 'blur(20px)' : 'none',
-          borderBottom: scrolled ? '1px solid rgba(255,255,255,0.06)' : 'none',
-        }}
+        className="fixed top-0 left-0 right-0 z-[5000] px-4 md:px-8 pt-2.5"
       >
-        <div className="max-w-[1280px] mx-auto px-6 md:px-10 h-16 flex items-center justify-between">
+        <div className={`nav-shell ${scrolled ? 'is-scrolled' : ''}`}>
+          <div className="relative z-10 mx-auto px-5 md:px-7 h-full flex items-center justify-between">
           {/* Logo */}
-          <button
-            className="magnetic-btn flex items-center gap-1 font-display text-xl font-bold"
-            style={{ fontFamily: 'var(--font-display)' }}
-            onClick={() => scrollTo('hero')}
-            aria-label="Back to top"
-          >
-            <span style={{ color: 'var(--text-primary)' }}>MZ</span>
-            <span
-              style={{
-                width: 6, height: 6, borderRadius: '50%',
-                background: 'var(--accent-primary)',
-                display: 'inline-block',
-                animation: 'avail-pulse 2s infinite',
-                marginBottom: 2,
-              }}
-            />
-          </button>
+          <SiteLogo scrolled={scrolled} onClick={() => scrollTo('hero')} />
 
           {/* Desktop links */}
           <nav className="hidden md:flex items-center gap-8" aria-label="Main">
@@ -101,16 +87,20 @@ export default function Navigation({ sections }: Props) {
               style={{ width: mobileOpen ? '1.5rem' : '1rem', transform: mobileOpen ? 'rotate(-45deg) translate(3.5px, -3.5px)' : 'none' }}
             />
           </button>
+          </div>
         </div>
       </header>
 
       {/* Mobile Overlay */}
       <div
+        ref={mobileMenuRef}
         className="fixed inset-0 z-[4900] flex flex-col items-start justify-center px-8"
+        aria-hidden={!mobileOpen}
         style={{
-          background: '#0a0a0a',
+          background: 'var(--bg-primary)',
           clipPath: mobileOpen ? 'inset(0% 0% 0% 0%)' : 'inset(0% 0% 100% 0%)',
           transition: 'clip-path 0.75s cubic-bezier(0.86,0,0.07,1)',
+          pointerEvents: mobileOpen ? 'auto' : 'none',
         }}
       >
         <nav className="flex flex-col gap-2" aria-label="Mobile navigation">

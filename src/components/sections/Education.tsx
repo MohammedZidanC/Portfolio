@@ -80,13 +80,13 @@ export default function Education() {
                       fontSize: '0.68rem',
                       letterSpacing: '0.1em',
                       color: 'var(--accent-primary)',
-                      borderColor: 'rgba(124,58,237,0.4)',
-                      background: 'rgba(124,58,237,0.08)',
+                      borderColor: 'rgba(198,167,121,0.4)',
+                      background: 'rgba(198,167,121,0.07)',
                     }}
                   >
                     {entry.dates}
                   </div>
-                  <EducationCard entry={entry} index={i} side={isLeft ? 'left' : 'right'} />
+                  <EducationCard entry={entry} side={isLeft ? 'left' : 'right'} />
                 </div>
 
                 {/* Center dot */}
@@ -102,21 +102,21 @@ export default function Education() {
 
         {/* Mobile stacked layout */}
         <div className="flex flex-col gap-8 md:hidden relative z-10">
-          {education.map((entry, i) => (
-            <div key={i}>
+          {education.map(entry => (
+            <div key={entry.institution + entry.degree}>
               <div
                 className="inline-block mb-3 px-3 py-1 rounded-full border text-xs"
                 style={{
                   fontFamily: 'var(--font-mono)',
                   fontSize: '0.68rem',
                   color: 'var(--accent-primary)',
-                  borderColor: 'rgba(124,58,237,0.4)',
-                  background: 'rgba(124,58,237,0.08)',
+                  borderColor: 'rgba(198,167,121,0.4)',
+                  background: 'rgba(198,167,121,0.07)',
                 }}
               >
                 {entry.dates}
               </div>
-              <EducationCard entry={entry} index={i} side="right" />
+              <EducationCard entry={entry} side="right" />
             </div>
           ))}
         </div>

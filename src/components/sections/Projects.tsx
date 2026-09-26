@@ -69,7 +69,7 @@ export default function Projects() {
                   color: 'var(--text-primary)',
                   clipPath: titleVisible ? 'inset(0 0 0% 0)' : 'inset(0 0 100% 0)',
                   transform: titleVisible ? 'translateY(0)' : 'translateY(100%)',
-                  transition: `clip-path 0.6s cubic-bezier(0.16,1,0.3,1) ${0.1 + i * 0.05}s, transform 0.6s cubic-bezier(0.16,1,0.3,1) ${0.1 + i * 0.05}s`,
+                  transition: `clip-path 0.34s cubic-bezier(0.16,1,0.3,1) ${0.04 + i * 0.014}s, transform 0.34s cubic-bezier(0.16,1,0.3,1) ${0.04 + i * 0.014}s`,
                 }}
                 aria-hidden={c === ' '}
               >
@@ -81,8 +81,8 @@ export default function Projects() {
 
         {/* Project grid — 2 cols desktop, 1 col mobile */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 relative z-10">
-          {projects.map((project, i) => (
-            <ProjectCard key={project.title} project={project} index={i} />
+          {projects.map(project => (
+            <ProjectCard key={project.title} project={project} />
           ))}
         </div>
       </div>

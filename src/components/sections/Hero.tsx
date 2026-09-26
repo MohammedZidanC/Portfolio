@@ -1,12 +1,16 @@
 'use client';
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef, type MouseEvent as ReactMouseEvent } from 'react';
 import Image from 'next/image';
 import AuroraBlobs from '@/components/ui/AuroraBlobs';
 import ConstellationCanvas from '@/components/ui/ConstellationCanvas';
 import MagneticButton from '@/components/shared/MagneticButton';
+import HeroMarkLayout from './hero-mark/HeroMarkLayout';
 import { personal, scrambleWords } from '@/lib/data';
 
 const CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%';
+
+type IntroPhase = 'loading' | 'flight' | 'handoff' | 'ready';
+type HeroClickBurst = { id: number; x: number; y: number };
 
 function useScramble(words: string[], interval = 2800) {
   const [display, setDisplay] = useState(words[0]);
@@ -37,20 +41,38 @@ function useScramble(words: string[], interval = 2800) {
   return display;
 }
 
-export default function Hero() {
-  const [ready, setReady] = useState(false);
+export default function Hero({ introPhase = 'ready' }: { introPhase?: IntroPhase }) {
+  const ready = introPhase === 'ready';
+  const [namesRevealed, setNamesRevealed] = useState(ready);
+  const [clickBursts, setClickBursts] = useState<HeroClickBurst[]>([]);
   const scrambled = useScramble(scrambleWords);
+  const burstSequence = useRef(0);
 
   useEffect(() => {
-    const t = setTimeout(() => setReady(true), 200);
-    return () => clearTimeout(t);
-  }, []);
-
-  const nameChars = personal.full_name.split('');
+    if (introPhase === 'ready' || introPhase === 'handoff') {
+      setNamesRevealed(true);
+      return;
+    }
+    if (introPhase === 'flight') {
+      const revealTimer = window.setTimeout(() => setNamesRevealed(true), 385);
+      return () => window.clearTimeout(revealTimer);
+    }
+    setNamesRevealed(false);
+  }, [introPhase]);
 
   const scrollToSection = (id: string) => {
     const el = document.getElementById(id);
     if (el) el.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  const onBackgroundClick = (event: ReactMouseEvent<HTMLElement>) => {
+    const target = event.target;
+    const isBackgroundSurface = target === event.currentTarget || (target instanceof HTMLElement && target.classList.contains('hero-copy'));
+    if (!isBackgroundSurface || (target instanceof HTMLElement && target.closest('a, button, input, textarea, [role="button"]')) || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const bounds = event.currentTarget.getBoundingClientRect();
+    const burst = { id: ++burstSequence.current, x: event.clientX - bounds.left, y: event.clientY - bounds.top };
+    setClickBursts(current => [...current.slice(-2), burst]);
+    window.setTimeout(() => setClickBursts(current => current.filter(item => item.id !== burst.id)), 1120);
   };
 
   return (
@@ -58,11 +80,22 @@ export default function Hero() {
       id="hero"
       className="relative min-h-screen flex items-center justify-center overflow-hidden"
       aria-label="Introduction"
+      onClick={onBackgroundClick}
     >
       <AuroraBlobs variant="hero" />
       <ConstellationCanvas />
+      {clickBursts.map(burst => (
+        <div key={burst.id} className="hero-click-burst" style={{ left: burst.x, top: burst.y }} aria-hidden="true">
+          <i className="hero-click-ring" />
+          <i className="hero-click-core" />
+          <i className="hero-click-spark" />
+          <i className="hero-click-spark" />
+          <i className="hero-click-spark" />
+          <i className="hero-click-spark" />
+        </div>
+      ))}
 
-      <div className="relative z-10 text-center px-6 max-w-5xl mx-auto">
+      <div className="hero-copy relative z-10 text-center px-6 max-w-5xl mx-auto">
         {/* Greeting */}
         <p
           className="mb-4 text-sm tracking-widest uppercase"
@@ -70,28 +103,24 @@ export default function Hero() {
             fontFamily: 'var(--font-mono)',
             color: 'var(--text-muted)',
             opacity: ready ? 1 : 0,
-            transform: ready ? 'translateY(0)' : 'translateY(15px)',
-            transition: 'opacity 0.6s ease 0.2s, transform 0.6s ease 0.2s',
+            letterSpacing: ready ? '0.15em' : '0.36em',
+            filter: ready ? 'blur(0)' : 'blur(4px)',
+            transition: 'opacity 0.24s ease 0.04s, letter-spacing 0.3s ease 0.04s, filter 0.24s ease 0.04s',
           }}
         >
           Hi, I&apos;m
         </p>
 
-        {/* Profile photo + Name */}
-        <div
-          className="flex flex-col items-center justify-center gap-5 mb-4"
-          style={{
-            opacity: ready ? 1 : 0,
-            transition: 'opacity 0.7s ease 0.3s',
-          }}
-        >
+        {/* Profile photo */}
+        <div className="flex flex-col items-center justify-center gap-5 mb-4">
           {/* Profile photo */}
           <div
             className="relative flex-shrink-0"
             style={{
               opacity: ready ? 1 : 0,
-              transform: ready ? 'scale(1)' : 'scale(0.7)',
-              transition: 'opacity 0.8s ease 0.3s, transform 0.8s cubic-bezier(0.16,1,0.3,1) 0.3s',
+              transform: ready ? 'scale(1)' : 'scale(0.86)',
+              filter: ready ? 'blur(0)' : 'blur(5px)',
+              transition: 'opacity 0.35s ease 0.06s, transform 0.35s cubic-bezier(0.2,.8,.2,1) 0.06s, filter 0.35s ease 0.06s',
             }}
           >
             <div
@@ -99,8 +128,8 @@ export default function Hero() {
               style={{
                 width: 'clamp(90px, 14vw, 130px)',
                 height: 'clamp(90px, 14vw, 130px)',
-                boxShadow: '0 0 30px rgba(124,58,237,0.35), 0 0 60px rgba(124,58,237,0.15)',
-                border: '2px solid rgba(124,58,237,0.4)',
+                boxShadow: '0 0 26px rgba(198,167,121,0.2), 0 0 52px rgba(198,167,121,0.08)',
+                border: '2px solid rgba(198,167,121,0.42)',
               }}
             >
               <Image
@@ -116,41 +145,15 @@ export default function Hero() {
             <div
               className="absolute inset-[-4px] rounded-full pointer-events-none"
               style={{
-                border: '1px solid rgba(124,58,237,0.3)',
-                animation: 'photo-ring-pulse 3s ease-in-out infinite',
+                border: '1px solid rgba(198,167,121,0.26)',
+                animation: ready ? 'photo-ring-pulse 3s ease-in-out infinite' : 'none',
               }}
               aria-hidden="true"
             />
           </div>
 
-          {/* Name — letter by letter */}
-          <h1
-            className="leading-none text-center"
-            style={{
-              fontFamily: 'var(--font-display)',
-              fontSize: 'clamp(1.4rem, 7vw, 5.5rem)',
-              fontWeight: 700,
-              letterSpacing: '-0.01em',
-              whiteSpace: 'nowrap',
-            }}
-            aria-label={personal.full_name}
-          >
-            {nameChars.map((c, i) => (
-              <span
-                key={i}
-                style={{
-                  display: c === ' ' ? 'inline' : 'inline-block',
-                  color: 'var(--text-primary)',
-                  opacity: ready ? 1 : 0,
-                  transform: ready ? 'translateY(0) rotate(0deg)' : 'translateY(60px) rotate(10deg)',
-                  transition: `opacity 0.7s cubic-bezier(0.16,1,0.3,1) ${0.4 + i * 0.04}s, transform 0.7s cubic-bezier(0.16,1,0.3,1) ${0.4 + i * 0.04}s`,
-                }}
-                aria-hidden={c === ' '}
-              >
-                {c === ' ' ? '\u00A0' : c}
-              </span>
-            ))}
-          </h1>
+          {/* Hero initials stay mounted beneath the splash, then appear as the traveling marks land. */}
+          <HeroMarkLayout namesRevealed={namesRevealed} marksVisible={introPhase === 'handoff' || ready} />
         </div>
 
         {/* Tagline 1 — outlined */}
@@ -164,8 +167,8 @@ export default function Hero() {
             WebkitTextStroke: '1px rgba(255,255,255,0.45)',
             color: 'transparent',
             opacity: ready ? 1 : 0,
-            transform: ready ? 'translateY(0)' : 'translateY(20px)',
-            transition: 'opacity 0.7s ease 1s, transform 0.7s ease 1s',
+            clipPath: ready ? 'inset(0)' : 'inset(100% 0 0)',
+            transition: 'opacity 0.29s ease 0.09s, clip-path 0.325s cubic-bezier(.2,.8,.2,1) 0.09s',
           }}
         >
           {personal.tagline_line1}
@@ -178,10 +181,10 @@ export default function Hero() {
             fontFamily: 'var(--font-mono)',
             fontSize: 'clamp(0.75rem, 1.5vw, 0.95rem)',
             color: 'var(--text-secondary)',
-            letterSpacing: '0.15em',
             opacity: ready ? 1 : 0,
-            transform: ready ? 'translateY(0)' : 'translateY(20px)',
-            transition: 'opacity 0.7s ease 1.15s, transform 0.7s ease 1.15s',
+            filter: ready ? 'blur(0)' : 'blur(7px)',
+            letterSpacing: ready ? '0.15em' : '0.27em',
+            transition: 'opacity 0.31s ease 0.135s, filter 0.31s ease 0.135s, letter-spacing 0.31s ease 0.135s',
           }}
         >
           {personal.tagline_line2}
@@ -192,7 +195,8 @@ export default function Hero() {
           className="mb-10 inline-flex items-center gap-3"
           style={{
             opacity: ready ? 1 : 0,
-            transition: 'opacity 0.7s ease 1.3s',
+            transform: ready ? 'scale(1)' : 'scale(.96)',
+            transition: 'opacity 0.25s ease 0.17s, transform 0.25s cubic-bezier(.2,.8,.2,1) 0.17s',
           }}
           aria-live="polite"
           aria-label={`Currently: ${scrambled}`}
@@ -219,16 +223,10 @@ export default function Hero() {
         </div>
 
         {/* CTA Buttons */}
-        <div
-          className="flex items-center justify-center gap-4 flex-wrap"
-          style={{
-            opacity: ready ? 1 : 0,
-            transform: ready ? 'translateY(0)' : 'translateY(20px)',
-            transition: 'opacity 0.7s ease 1.45s, transform 0.7s ease 1.45s',
-          }}
-        >
+        <div className="flex items-center justify-center gap-4 flex-wrap">
           <MagneticButton
             className="hero-cta-primary px-7 py-3.5 rounded-lg text-sm tracking-widest uppercase font-medium text-white"
+            style={{ opacity: ready ? 1 : 0, transform: ready ? 'scale(1)' : 'scale(.94)', transition: 'opacity .25s ease .19s, transform .275s cubic-bezier(.2,.8,.2,1) .19s' }}
             onClick={() => scrollToSection('projects')}
             aria-label="View my work"
           >
@@ -239,6 +237,7 @@ export default function Hero() {
 
           <MagneticButton
             className="hero-cta-secondary px-7 py-3.5 rounded-lg text-sm tracking-widest uppercase"
+            style={{ opacity: ready ? 1 : 0, clipPath: ready ? 'inset(0)' : 'inset(0 100% 0 0)', transition: 'opacity .25s ease .25s, clip-path .3s cubic-bezier(.2,.8,.2,1) .25s' }}
             onClick={() => scrollToSection('contact')}
             aria-label="Get in touch"
           >
@@ -252,7 +251,7 @@ export default function Hero() {
       {/* Scroll indicator */}
       <div
         className="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 z-10"
-        style={{ opacity: ready ? 1 : 0, transition: 'opacity 0.7s ease 1.8s' }}
+        style={{ opacity: ready ? 1 : 0, filter: ready ? 'blur(0)' : 'blur(5px)', transition: 'opacity 0.275s ease .29s, filter 0.275s ease .29s' }}
         aria-hidden="true"
       >
         <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.55rem', letterSpacing: '0.25em', color: 'var(--text-muted)' }}>
@@ -265,7 +264,7 @@ export default function Hero() {
 
       <style>{`
         @keyframes bounce-y { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(6px); } }
-        @keyframes avail-pulse { 0%, 100% { box-shadow: 0 0 4px #7c3aed; } 50% { box-shadow: 0 0 16px #7c3aed, 0 0 30px rgba(124,58,237,0.4); } }
+        @keyframes avail-pulse { 0%, 100% { box-shadow: 0 0 4px #c6a779; } 50% { box-shadow: 0 0 12px #c6a779, 0 0 24px rgba(198,167,121,0.24); } }
         @keyframes photo-ring-pulse { 0%, 100% { opacity: 0.6; transform: scale(1); } 50% { opacity: 0; transform: scale(1.3); } }
       `}</style>
     </section>

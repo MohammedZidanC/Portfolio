@@ -1,61 +1,67 @@
 'use client';
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 export default function Cursor() {
-  const [pos, setPos]     = useState({ x: -100, y: -100 });
-  const [ring, setRing]   = useState({ x: -100, y: -100 });
   const [state, setState] = useState<'default' | 'hover-link' | 'hover-card'>('default');
   const [visible, setVisible] = useState(false);
+  const dotRef = useRef<HTMLDivElement>(null);
+  const ringRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    let raf: number;
-    let aimX = -100, aimY = -100;
-    let ringX = -100, ringY = -100;
+    let raf = 0;
+    let aimX = -100, aimY = -100, ringX = -100, ringY = -100;
+    let disposed = false;
+    const finePointer = window.matchMedia('(hover: hover) and (pointer: fine)');
+
+    const animateRing = () => {
+      raf = 0;
+      const dx = aimX - ringX;
+      const dy = aimY - ringY;
+      ringX += dx * 0.38;
+      ringY += dy * 0.38;
+      ringRef.current?.style.setProperty('--cursor-x', `${ringX}px`);
+      ringRef.current?.style.setProperty('--cursor-y', `${ringY}px`);
+      dotRef.current?.style.setProperty('--cursor-x', `${ringX}px`);
+      dotRef.current?.style.setProperty('--cursor-y', `${ringY}px`);
+      if (!disposed && Math.abs(dx) + Math.abs(dy) > 0.2) raf = requestAnimationFrame(animateRing);
+    };
+    const queueRing = () => {
+      if (!raf && !disposed) raf = requestAnimationFrame(animateRing);
+    };
 
     const onMove = (e: MouseEvent) => {
       aimX = e.clientX; aimY = e.clientY;
-      setPos({ x: aimX, y: aimY });
-      if (!visible) setVisible(true);
+      setVisible(true);
+      queueRing();
     };
 
-    const lerp = () => {
-      ringX += (aimX - ringX) * 0.12;
-      ringY += (aimY - ringY) * 0.12;
-      setRing({ x: ringX, y: ringY });
-      raf = requestAnimationFrame(lerp);
+    if (finePointer.matches) window.addEventListener('mousemove', onMove, { passive: true });
+
+    const onPointerOver = (event: PointerEvent) => {
+      const target = event.target as HTMLElement | null;
+      setState(target?.closest('.project-card') ? 'hover-card' : target?.closest('a, button, input, textarea') ? 'hover-link' : 'default');
     };
-
-    raf = requestAnimationFrame(lerp);
-    window.addEventListener('mousemove', onMove);
-
-    const isTouchDevice = () => window.matchMedia('(hover: none)').matches;
-
-    const addListeners = () => {
-      if (isTouchDevice()) return;
-      document.querySelectorAll('a, button, .magnetic-btn, input, textarea').forEach(el => {
-        el.addEventListener('mouseenter', () => setState('hover-link'));
-        el.addEventListener('mouseleave', () => setState('default'));
-      });
-      document.querySelectorAll('.project-card').forEach(el => {
-        el.addEventListener('mouseenter', () => setState('hover-card'));
-        el.addEventListener('mouseleave', () => setState('default'));
-      });
-    };
-
-    addListeners();
-
-    const mo = new MutationObserver(addListeners);
-    mo.observe(document.body, { childList: true, subtree: true });
-
-    window.addEventListener('mouseleave', () => setVisible(false));
-    window.addEventListener('mouseenter', () => setVisible(true));
+    const onLeave = () => setVisible(false);
+    const onEnter = () => { if (finePointer.matches && !document.body.classList.contains('certificate-open')) setVisible(true); };
+    const modalObserver = new MutationObserver(() => {
+      const modalOpen = document.body.classList.contains('certificate-open');
+      setVisible(!modalOpen && finePointer.matches);
+    });
+    modalObserver.observe(document.body, { attributes: true, attributeFilter: ['class'] });
+    document.addEventListener('pointerover', onPointerOver, { passive: true });
+    window.addEventListener('mouseleave', onLeave);
+    window.addEventListener('mouseenter', onEnter);
 
     return () => {
+      disposed = true;
       cancelAnimationFrame(raf);
       window.removeEventListener('mousemove', onMove);
-      mo.disconnect();
+      document.removeEventListener('pointerover', onPointerOver);
+      window.removeEventListener('mouseleave', onLeave);
+      window.removeEventListener('mouseenter', onEnter);
+      modalObserver.disconnect();
     };
-  }, [visible]);
+  }, []);
 
   const ringClass = `cursor-ring ${
     state === 'hover-link' ? 'hover-link' :
@@ -67,13 +73,13 @@ export default function Cursor() {
   return (
     <>
       <div
+        ref={dotRef}
         className="cursor-dot"
-        style={{ left: pos.x, top: pos.y }}
         aria-hidden="true"
       />
       <div
+        ref={ringRef}
         className={ringClass}
-        style={{ left: ring.x, top: ring.y }}
         aria-hidden="true"
       />
     </>
