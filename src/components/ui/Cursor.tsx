@@ -4,7 +4,6 @@ import { useEffect, useRef, useState } from 'react';
 export default function Cursor() {
   const [state, setState] = useState<'default' | 'hover-link' | 'hover-card'>('default');
   const [visible, setVisible] = useState(false);
-  const dotRef = useRef<HTMLDivElement>(null);
   const ringRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -21,8 +20,6 @@ export default function Cursor() {
       ringY += dy * 0.38;
       ringRef.current?.style.setProperty('--cursor-x', `${ringX}px`);
       ringRef.current?.style.setProperty('--cursor-y', `${ringY}px`);
-      dotRef.current?.style.setProperty('--cursor-x', `${ringX}px`);
-      dotRef.current?.style.setProperty('--cursor-y', `${ringY}px`);
       if (!disposed && Math.abs(dx) + Math.abs(dy) > 0.2) raf = requestAnimationFrame(animateRing);
     };
     const queueRing = () => {
@@ -71,17 +68,12 @@ export default function Cursor() {
   if (!visible) return null;
 
   return (
-    <>
-      <div
-        ref={dotRef}
-        className="cursor-dot"
-        aria-hidden="true"
-      />
-      <div
-        ref={ringRef}
-        className={ringClass}
-        aria-hidden="true"
-      />
-    </>
+    <div
+      ref={ringRef}
+      className={ringClass}
+      aria-hidden="true"
+    >
+      <span className="cursor-x" />
+    </div>
   );
 }
