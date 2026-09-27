@@ -1,16 +1,10 @@
 import { personal } from '@/lib/data';
+import FooterRoverRoad from '@/components/ui/FooterRoverRoad';
 
 export default function Footer() {
   return (
-    <footer
-      className="relative"
-      style={{
-        borderTop: '1px solid',
-        borderImageSource: 'linear-gradient(90deg, transparent, var(--accent-primary), transparent)',
-        borderImageSlice: 1,
-      }}
-      aria-label="Site footer"
-    >
+    <footer className="relative" aria-label="Site footer">
+      <FooterRoverRoad />
       <div className="max-w-[1280px] mx-auto px-6 md:px-10 py-8 flex flex-col md:flex-row items-center justify-between gap-4">
         {/* Left */}
         <p style={{ fontFamily: 'var(--font-mono)', fontSize: '0.68rem', color: 'var(--text-muted)', letterSpacing: '0.08em' }}>
