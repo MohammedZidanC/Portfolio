@@ -1,4 +1,5 @@
 import Image from 'next/image';
+import type { CSSProperties } from 'react';
 import SectionNumber from '@/components/shared/SectionNumber';
 import { badges } from '@/lib/data';
 
@@ -29,13 +30,15 @@ export default function Badges() {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 relative z-10">
-          {badges.map((badge) => (
+          {badges.map((badge, index) => (
             <a
               key={badge.title}
               href={badge.verify}
               target="_blank"
               rel="noopener noreferrer"
               className="badge-card group flex items-center gap-5 p-4 sm:p-5 rounded-2xl border text-left transition-all duration-300"
+              data-scroll-reveal
+              style={{ '--reveal-delay': `${index * 110}ms` } as CSSProperties}
               aria-label={`${badge.title}, earned ${badge.earned}. Open verification page.`}
             >
               <span className="badge-artwork relative block shrink-0 overflow-hidden rounded-xl">

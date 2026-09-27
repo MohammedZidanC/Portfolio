@@ -15,7 +15,7 @@ export default function ScrollEffects() {
         entry.target.classList.add('visible');
         observer.unobserve(entry.target);
       });
-    }, { rootMargin: '0px 0px -16% 0px', threshold: 0.01 });
+    }, { rootMargin: '0px 0px -8% 0px', threshold: 0.02 });
 
     targets.forEach(target => observer.observe(target));
     return () => observer.disconnect();

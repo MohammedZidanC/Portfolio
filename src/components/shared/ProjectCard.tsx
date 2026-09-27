@@ -1,5 +1,6 @@
 'use client';
 import Image from 'next/image';
+import type { CSSProperties } from 'react';
 
 interface Project {
   title: string;
@@ -14,11 +15,12 @@ interface Project {
 
 interface Props {
   project: Project;
+  index: number;
 }
 
-export default function ProjectCard({ project }: Props) {
+export default function ProjectCard({ project, index }: Props) {
   return (
-    <div className="project-card" data-scroll-reveal aria-label={`Project: ${project.title}`}>
+    <div className="project-card" data-scroll-reveal style={{ '--reveal-delay': `${(index % 2) * 75}ms` } as CSSProperties} aria-label={`Project: ${project.title}`}>
       {/* Year badge */}
       <div
         className="absolute top-4 right-4 z-10 text-xs tracking-widest px-2 py-1 rounded border"

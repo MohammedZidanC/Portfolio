@@ -81,8 +81,8 @@ export default function Projects() {
 
         {/* Project grid — 2 cols desktop, 1 col mobile */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 relative z-10">
-          {projects.map(project => (
-            <ProjectCard key={project.title} project={project} />
+          {projects.map((project, index) => (
+            <ProjectCard key={project.title} project={project} index={index} />
           ))}
         </div>
       </div>

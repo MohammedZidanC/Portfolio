@@ -1,10 +1,22 @@
 'use client';
 
-import { useEffect, useRef, type CSSProperties } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties } from 'react';
 import * as THREE from 'three';
 
 type Star = { x: number; y: number; r: number; delay: number; duration: number };
-type ShootingStar = { x: number; y: number; length: number; travelX: number; travelY: number; delay: number; duration: number };
+type ShootingStar = { x: number; y: number; length: number; travelX: number; travelY: number; angle: number; delay: number; duration: number };
+
+// Single source of truth for shooting-star paths. Each star gets its own
+// randomized entry point and angle within this narrow, down-right direction.
+const SHOOTING_STAR_PATH_RULES = {
+  entriesPerSide: 3,
+  angleMargin: 5,
+  minAngle: 1,
+  maxAngle: 89,
+  offscreenPadding: 350,
+  entryInset: 0.06,
+  entrySpread: 0.88,
+} as const;
 
 let seed = 90417;
 const random = () => {
@@ -20,23 +32,69 @@ const STARS: Star[] = Array.from({ length: 70 }, () => ({
   duration: 3.4 + random() * 5.2,
 }));
 
-// Ten stars is an 11% increase over the previous nine. Each one travels along
-// one forward-only path and stays invisible for the rest of its cycle.
-const SHOOTING_STARS: ShootingStar[] = Array.from({ length: 10 }, (_, index) => {
-  const duration = 17 + random() * 12;
-  return {
-    x: index === 0 ? 66 : 8 + random() * 81,
-    y: index === 0 ? 20 : 7 + random() * 82,
-    length: 260 + random() * 180,
-    travelX: 340 + random() * 210,
-    travelY: 140 + random() * 120,
-    delay: index === 0 ? -duration * 0.04 : -random() * duration,
-    duration,
-  };
-});
+// Each streak begins beyond the viewport and follows one measured straight path.
+function createShootingStars(width: number, height: number): ShootingStar[] {
+  // Vary individual paths while keeping them aimed down-right within five
+  // degrees of the viewport diagonal.
+  const diagonal = Math.atan2(height, width) * 180 / Math.PI;
+  const entrySides = Array.from(
+    { length: SHOOTING_STAR_PATH_RULES.entriesPerSide * 2 },
+    (_, index) => index < SHOOTING_STAR_PATH_RULES.entriesPerSide,
+  );
+  // Shuffle a balanced pool so each screen gets the same number from the top
+  // and the viewer's left, without assigning a fixed path to any star.
+  for (let index = entrySides.length - 1; index > 0; index -= 1) {
+    const swapIndex = Math.floor(random() * (index + 1));
+    [entrySides[index], entrySides[swapIndex]] = [entrySides[swapIndex], entrySides[index]];
+  }
+
+  return entrySides.map((entersFromTop, index) => {
+    // A triangular distribution makes near-diagonal paths more common while
+    // still allowing the full +/- 5 degree range.
+    const angleOffset = (random() + random() + random() - 1.5) * (SHOOTING_STAR_PATH_RULES.angleMargin / 1.5);
+    const degrees = Math.max(
+      SHOOTING_STAR_PATH_RULES.minAngle,
+      Math.min(SHOOTING_STAR_PATH_RULES.maxAngle, diagonal + angleOffset),
+    );
+    const angle = degrees * Math.PI / 180;
+    const dx = Math.cos(angle);
+    const dy = Math.sin(angle);
+    const padding = SHOOTING_STAR_PATH_RULES.offscreenPadding;
+    const startX = entersFromTop
+      ? width * (SHOOTING_STAR_PATH_RULES.entryInset + random() * SHOOTING_STAR_PATH_RULES.entrySpread)
+      : -padding;
+    const startY = entersFromTop
+      ? -padding
+      : height * (SHOOTING_STAR_PATH_RULES.entryInset + random() * SHOOTING_STAR_PATH_RULES.entrySpread);
+    const distanceToViewportExit = Math.min((width - startX) / dx, (height - startY) / dy);
+    const distance = distanceToViewportExit + padding;
+    const travelX = dx * distance;
+    const travelY = dy * distance;
+
+    return {
+      x: startX,
+      y: startY,
+      length: (260 + (index % 4) * 42) * 0.94,
+      travelX,
+      travelY,
+      // Derive trail alignment from the enforced travel vector itself.
+      angle: Math.atan2(travelY, travelX) * 180 / Math.PI,
+      delay: index * 5.5,
+      duration: 17 + (index % 3) * 2,
+    };
+  });
+}
 
 export default function CelestialBackdrop() {
   const moonRef = useRef<HTMLDivElement>(null);
+  const [shootingStars, setShootingStars] = useState<ShootingStar[]>([]);
+
+  useLayoutEffect(() => {
+    const updatePaths = () => setShootingStars(createShootingStars(window.innerWidth, window.innerHeight));
+    updatePaths();
+    window.addEventListener('resize', updatePaths, { passive: true });
+    return () => window.removeEventListener('resize', updatePaths);
+  }, []);
 
   useEffect(() => {
     const host = moonRef.current;
@@ -45,10 +103,14 @@ export default function CelestialBackdrop() {
     let disposed = false;
     let frame = 0;
     let previousScrollY = window.scrollY;
-    let targetYaw = 0;
     let targetPitch = 0;
-    let currentYaw = 0;
     let currentPitch = 0;
+    let yaw = 0;
+    let scrollBoost = 0;
+    let previousFrameTime = 0;
+    let lastDrawTime = 0;
+    const idleRotationSpeed = 0.025;
+    const minFrameInterval = window.matchMedia('(max-width: 700px)').matches ? 1000 / 30 : 1000 / 60;
     const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
 
     const renderer = new THREE.WebGLRenderer({
@@ -121,15 +183,21 @@ export default function CelestialBackdrop() {
     };
 
     const render = () => renderer.render(scene, camera);
-    const animate = () => {
+    const animate = (time: number) => {
       frame = 0;
-      currentYaw += (targetYaw - currentYaw) * 0.085;
-      currentPitch += (targetPitch - currentPitch) * 0.085;
-      moon.rotation.set(currentPitch, currentYaw, currentPitch * -0.22);
-      render();
-      if (Math.abs(targetYaw - currentYaw) > 0.00015 || Math.abs(targetPitch - currentPitch) > 0.00015) {
-        frame = window.requestAnimationFrame(animate);
+      const frameDelta = previousFrameTime ? Math.min((time - previousFrameTime) / 1000, 0.05) : 0;
+      previousFrameTime = time;
+      if (time - lastDrawTime >= minFrameInterval) {
+        const drawDelta = lastDrawTime ? Math.min((time - lastDrawTime) / 1000, 0.1) : 0;
+        yaw += (idleRotationSpeed + scrollBoost) * drawDelta;
+        currentPitch += (targetPitch - currentPitch) * Math.min(1, drawDelta * 3.2);
+        moon.rotation.set(currentPitch, yaw, currentPitch * -0.22);
+        render();
+        lastDrawTime = time;
       }
+      scrollBoost *= Math.exp(-frameDelta * 2.3);
+      if (scrollBoost < 0.008) scrollBoost = 0;
+      if (!reducedMotion.matches) frame = window.requestAnimationFrame(animate);
     };
     const queueMotionFrame = () => {
       if (!frame && !disposed && document.visibilityState === 'visible') {
@@ -141,7 +209,7 @@ export default function CelestialBackdrop() {
       const scrollY = window.scrollY;
       if (!reducedMotion.matches) {
         const delta = Math.max(-180, Math.min(180, scrollY - previousScrollY));
-        targetYaw += delta * 0.00125;
+        scrollBoost = Math.min(0.82, scrollBoost + Math.abs(delta) * 0.0032);
         targetPitch += delta * 0.000075;
         queueMotionFrame();
       }
@@ -151,7 +219,11 @@ export default function CelestialBackdrop() {
       if (document.visibilityState === 'hidden' && frame) {
         window.cancelAnimationFrame(frame);
         frame = 0;
+        previousFrameTime = 0;
+        lastDrawTime = 0;
       } else {
+        previousFrameTime = 0;
+        lastDrawTime = 0;
         queueMotionFrame();
       }
     }
@@ -159,10 +231,13 @@ export default function CelestialBackdrop() {
       if (reducedMotion.matches && frame) {
         window.cancelAnimationFrame(frame);
         frame = 0;
-        currentYaw = targetYaw;
         currentPitch = targetPitch;
-        moon.rotation.set(currentPitch, currentYaw, currentPitch * -0.22);
+        moon.rotation.set(currentPitch, yaw, currentPitch * -0.22);
         render();
+      } else {
+        previousFrameTime = 0;
+        lastDrawTime = 0;
+        queueMotionFrame();
       }
     }
 
@@ -172,6 +247,7 @@ export default function CelestialBackdrop() {
     window.addEventListener('scroll', onScroll, { passive: true });
     document.addEventListener('visibilitychange', onVisibilityChange);
     reducedMotion.addEventListener('change', onMotionPreferenceChange);
+    queueMotionFrame();
 
     return () => {
       disposed = true;
@@ -196,11 +272,11 @@ export default function CelestialBackdrop() {
           <i key={index} style={{ left: `${star.x}%`, top: `${star.y}%`, width: star.r * 2, height: star.r * 2, animationDelay: `${star.delay}s`, animationDuration: `${star.duration}s` }} />
         ))}
       </div>
-      {SHOOTING_STARS.map((star, index) => (
+      {shootingStars.map((star, index) => (
         <i
           key={index}
           className="celestial-shooting-star"
-          style={{ left: `${star.x}%`, top: `${star.y}%`, width: star.length, animationDelay: `${star.delay}s`, animationDuration: `${star.duration}s`, '--shot-x': `${star.travelX}px`, '--shot-y': `${star.travelY}px` } as CSSProperties}
+          style={{ left: star.x, top: star.y, animationDelay: `${star.delay}s`, animationDuration: `${star.duration}s`, '--shot-x': `${star.travelX}px`, '--shot-y': `${star.travelY}px`, '--trail-length': `${star.length}px`, '--shot-angle': `${star.angle}deg` } as CSSProperties}
         />
       ))}
       <div className="moon-corner">

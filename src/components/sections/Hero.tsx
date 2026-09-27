@@ -126,8 +126,8 @@ export default function Hero({ introPhase = 'ready' }: { introPhase?: IntroPhase
             <div
               className="rounded-full overflow-hidden relative"
               style={{
-                width: 'clamp(90px, 14vw, 130px)',
-                height: 'clamp(90px, 14vw, 130px)',
+                width: 'clamp(135px, 21vw, 195px)',
+                height: 'clamp(135px, 21vw, 195px)',
                 boxShadow: '0 0 26px rgba(198,167,121,0.2), 0 0 52px rgba(198,167,121,0.08)',
                 border: '2px solid rgba(198,167,121,0.42)',
               }}
@@ -135,8 +135,8 @@ export default function Hero({ introPhase = 'ready' }: { introPhase?: IntroPhase
               <Image
                 src={personal.photo}
                 alt={personal.full_name}
-                width={130}
-                height={130}
+                width={195}
+                height={195}
                 className="w-full h-full object-cover"
                 priority
               />

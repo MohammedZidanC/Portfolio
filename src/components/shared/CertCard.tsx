@@ -1,5 +1,5 @@
 'use client';
-import { useRef } from 'react';
+import { useRef, type CSSProperties } from 'react';
 import Image from 'next/image';
 
 interface Cert {
@@ -38,7 +38,7 @@ export default function CertCard({ cert, index }: Props) {
 
   return (
     <>
-      <div data-scroll-reveal data-tone={index % 3} className={`cert-card ${isAward ? 'award' : ''}`} aria-label={`Certification: ${cert.title}`}>
+      <div data-scroll-reveal data-tone={index % 3} style={{ '--reveal-delay': `${(index % 3) * 65}ms` } as CSSProperties} className={`cert-card ${isAward ? 'award' : ''}`} aria-label={`Certification: ${cert.title}`}>
         {isAward && (
           <div
             className="inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded mb-3"

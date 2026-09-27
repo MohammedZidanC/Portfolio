@@ -191,7 +191,9 @@ h1, h2, h3, h4 {
 .celestial-backdrop { position:fixed; inset:0; z-index:0; overflow:hidden; opacity:1; pointer-events:none; }
 .celestial-stars { position:absolute; inset:0; }
 .celestial-stars i { position:absolute; display:block; border-radius:50%; background:#eee8da; box-shadow:0 0 7px rgba(238,232,218,.46); opacity:.22; animation:celestial-twinkle 5s ease-in-out infinite; }
-.celestial-shooting-star { position:absolute; display:block; height:2px; border-radius:999px; transform-origin:left center; opacity:0; background:linear-gradient(90deg,#fff8e9 0%,rgba(238,232,218,.78) 8%,rgba(238,232,218,.35) 34%,rgba(238,232,218,.08) 72%,transparent 100%); filter:drop-shadow(0 0 6px rgba(226,215,193,.72)); animation:celestial-shoot 22s linear infinite; }
+.celestial-shooting-star { position:absolute; display:block; width:0; height:0; opacity:0; will-change:transform,opacity; animation:celestial-shoot 18s linear infinite; }
+.celestial-shooting-star::before { content:""; position:absolute; left:0; top:0; width:2px; height:2px; border-radius:50%; background:#eee8da; box-shadow:0 0 3px 1px rgba(238,232,218,.42),0 0 8px rgba(238,232,218,.3); transform:translate(-50%,-50%); }
+.celestial-shooting-star::after { content:""; position:absolute; top:0; right:0; width:var(--trail-length); height:1px; border-radius:999px; transform-origin:right center; transform:rotate(var(--shot-angle)) scaleX(0); background:linear-gradient(90deg,transparent 0%,rgba(238,232,218,.06) 54%,rgba(238,232,218,.3) 87%,rgba(238,232,218,.72) 100%); filter:drop-shadow(0 0 3px rgba(226,215,193,.3)); animation:celestial-trail-grow 18s linear infinite; animation-duration:inherit; animation-delay:inherit; }
 .moon-corner { position:absolute; top:0; right:0; width:clamp(645px,69vw,1035px); aspect-ratio:1; transform:translate(50%,-50%); opacity:.76; filter:drop-shadow(0 0 36px rgba(190,183,164,.14)); -webkit-mask-image:linear-gradient(to bottom,transparent 47%,rgba(0,0,0,.04) 55%,rgba(0,0,0,.5) 68%,#000 80%); mask-image:linear-gradient(to bottom,transparent 47%,rgba(0,0,0,.04) 55%,rgba(0,0,0,.5) 68%,#000 80%); }
 .moon-scene,.moon-disc { display:block; width:100%; height:100%; }
 .moon-disc { outline:none; }
@@ -205,7 +207,8 @@ h1, h2, h3, h4 {
 .hero-click-spark:nth-child(5) { --spark-x:-16px; --spark-y:25px; animation-delay:.04s; }
 .hero-click-spark:nth-child(6) { --spark-x:29px; --spark-y:14px; animation-delay:.015s; }
 @keyframes celestial-twinkle { 0%,100%{opacity:.18;scale:.8}48%{opacity:.58;scale:1.18} }
-@keyframes celestial-shoot { 0%{opacity:0;transform:translate3d(0,0,0) rotate(208deg) scaleX(.02)}3%{opacity:.96;transform:translate3d(0,0,0) rotate(208deg) scaleX(1)}18%{opacity:0;transform:translate3d(var(--shot-x),var(--shot-y),0) rotate(208deg) scaleX(.88)}100%{opacity:0;transform:translate3d(var(--shot-x),var(--shot-y),0) rotate(208deg) scaleX(.88)} }
+@keyframes celestial-shoot { 0%,4%{opacity:0;transform:translate3d(0,0,0)}7%,82%{opacity:.72}96%,100%{opacity:0;transform:translate3d(var(--shot-x),var(--shot-y),0)} }
+@keyframes celestial-trail-grow { 0%,7%{transform:rotate(var(--shot-angle)) scaleX(0)}42%,100%{transform:rotate(var(--shot-angle)) scaleX(1)} }
 @keyframes hero-click-ring { from{opacity:.8;transform:translate(-50%,-50%) scale(.35)}to{opacity:0;transform:translate(-50%,-50%) scale(4.4)} }
 @keyframes hero-click-flare { from{opacity:.9;transform:translate(-50%,-50%) scale(.2)}to{opacity:0;transform:translate(-50%,-50%) scale(3.6)} }
 @keyframes hero-click-core { 0%{opacity:0;scale:.2}25%{opacity:1;scale:1.4}100%{opacity:0;scale:.35} }
@@ -341,8 +344,8 @@ h1, h2, h3, h4 {
    NAVIGATION
 ═══════════════════════════════════════════════ */
 .site-foreground { position: relative; z-index: 1; }
-.scroll-reactive-backdrop { position: fixed; inset: 0; z-index: 0; display: block; width: 100vw; height: 100vh; overflow: hidden; pointer-events: none; opacity: 0; transform: translate3d(0,var(--backdrop-parallax,0px),0); transition: opacity 1.25s cubic-bezier(.2,.7,.2,1); will-change: opacity,transform; }
-.scroll-reactive-backdrop i { position:absolute; display:block; border-radius:50%; background:radial-gradient(circle,rgba(var(--glow-tone),.24) 0%,rgba(var(--glow-tone),.17) 24%,rgba(var(--glow-tone),.07) 58%,rgba(var(--glow-tone),.018) 84%,transparent 100%); animation-play-state:var(--field-play-state,paused); }
+.scroll-reactive-backdrop { position: fixed; inset: 0; z-index: 0; display: block; width: 100vw; height: 100vh; overflow: hidden; pointer-events: none; opacity: 0; transition: opacity 1.25s cubic-bezier(.2,.7,.2,1); will-change: opacity; }
+.scroll-reactive-backdrop i { position:absolute; display:block; border-radius:50%; translate:0 var(--backdrop-parallax,0px); background:radial-gradient(circle,rgba(var(--glow-tone),.24) 0%,rgba(var(--glow-tone),.17) 24%,rgba(var(--glow-tone),.07) 58%,rgba(var(--glow-tone),.018) 84%,transparent 100%); animation-play-state:var(--field-play-state,paused); }
 .glow-field-one { animation:glow-drift-one 58s ease-in-out infinite; }
 .glow-field-two { animation:glow-drift-two 66s ease-in-out infinite; }
 .glow-field-three { animation:glow-drift-three 61s ease-in-out infinite; }
@@ -841,6 +844,17 @@ body.certificate-open .cursor-ring{display:none!important}
 .cert-card{transition:opacity .26s var(--ease-out-expo),transform .3s var(--ease-out-expo),border-color .2s,box-shadow .2s,translate .2s}
 .edu-card{transition:opacity .28s var(--ease-out-expo),transform .32s var(--ease-out-expo),border-color .2s,box-shadow .2s}
 .project-card .project-source-btn{transition:opacity .2s,transform .2s var(--ease-out-expo)}
+
+/* Let each card settle into view before it becomes fully legible. */
+.project-card[data-scroll-reveal],.cert-card[data-scroll-reveal],.badge-card[data-scroll-reveal]{opacity:0;transform:translate3d(0,22px,0) scale(.99);transition:opacity .82s cubic-bezier(.2,.72,.22,1) var(--reveal-delay,0ms),transform .88s cubic-bezier(.2,.72,.22,1) var(--reveal-delay,0ms),border-color .3s,box-shadow .3s,translate .3s}
+.project-card[data-scroll-reveal].visible,.cert-card[data-scroll-reveal].visible,.badge-card[data-scroll-reveal].visible{opacity:1;transform:translate3d(0,0,0) scale(1)}
+.badge-card[data-scroll-reveal].visible:hover{transform:translateY(-2px)}
+
+@media(max-width:700px){
+  .project-card[data-scroll-reveal],.cert-card[data-scroll-reveal],.badge-card[data-scroll-reveal]{transform:translate3d(0,16px,0) scale(.995);transition-duration:.9s,.96s,.3s,.3s,.3s}
+  .project-card[data-scroll-reveal].visible,.cert-card[data-scroll-reveal].visible,.badge-card[data-scroll-reveal].visible{transform:translate3d(0,0,0) scale(1)}
+  .badge-card[data-scroll-reveal].visible:hover{transform:translateY(-2px)}
+}
 
 @media(max-width:700px){
   .skill-orbit-stage{width:min(100%,520px);margin-block:1rem}

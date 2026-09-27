@@ -29,9 +29,9 @@ export const education = [
     institution: "Brilliant Study Centre Pala",
     location: "Kerala",
     degree: "Entrance Examination Preparation",
-    field: "Engineering & Medical Competitive Exams",
+    field: "JEE Main and Advanced",
     dates: "2023 – 2024",
-    note: "Intensive preparation year for national competitive engineering exams",
+    note: "Intensive preparation for JEE Main and JEE Advanced",
     url: "https://brilliantpala.org/",
     logo: "/Logos/pala.png",
     icon: "book",
@@ -169,6 +169,28 @@ export const certifications = [
   { title: "Student Membership", issuer: "ISTE · SRMIST", date: "10 Feb 2025 — 10 Feb 2029", tags: ["Membership", "Engineering"], detail: "Professional student membership at SRMIST.", pdf: "/Certifications/ISTE Membership.pdf", type: "membership" as const },
   { title: "Community Connect · Certificate of Merit", issuer: "Wayanad Muslim Orphanage", date: "17–19 Jun 2026 · Issued 20 Jun", tags: ["Volunteering", "Community Service", "Technical"], detail: "Completed the Community Connect volunteer engagement as part of SRMIST’s Community Service and Social Responsibility coursework. The work included a technical review of the IT laboratory, gymnasium, and CCTV system, alongside community service.", preview: "/CertificationPreviews/WMO Volunteering.webp", type: "community" as const },
 ];
+
+const credentialOrder = [
+  "Verilog HDL — Hands On",
+  "Digital Logic Design: A Complete Guide",
+  "Signals and Systems: A Foundation of Signal Processing",
+  "Embedded Systems & IoT Workshop",
+  "CS107: C++ Programming",
+  "Python Bootcamp: 30 Hours of Step by Step Python Lessons",
+  "Developer Tools & Methodologies",
+  "Claude Code 101",
+  "Freedom with AI Masterclass",
+  "Community Connect · Certificate of Merit",
+  "Engineering Job Simulation",
+  "Student Membership",
+  "Reuse and Remodel — 1st Prize",
+  "Job Readiness & Professional Development Program",
+  "Employability Skills Mastery · Lecture Series I",
+  "Employability Skills",
+  "Understanding Sustainable Development Goals (SDGs)",
+];
+const credentialRank = new Map(credentialOrder.map((title, index) => [title, index]));
+certifications.sort((a, b) => (credentialRank.get(a.title) ?? Infinity) - (credentialRank.get(b.title) ?? Infinity));
 
 export const badges = [
   {
