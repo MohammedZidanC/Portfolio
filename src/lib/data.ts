@@ -170,6 +170,37 @@ export const certifications = [
   { title: "Community Connect · Certificate of Merit", issuer: "Wayanad Muslim Orphanage", date: "17–19 Jun 2026 · Issued 20 Jun", tags: ["Volunteering", "Community Service", "Technical"], detail: "Completed the Community Connect volunteer engagement as part of SRMIST’s Community Service and Social Responsibility coursework. The work included a technical review of the IT laboratory, gymnasium, and CCTV system, alongside community service.", preview: "/CertificationPreviews/WMO Volunteering.webp", type: "community" as const },
 ];
 
+export const badges = [
+  {
+    title: "Introduction to Generative AI",
+    issuer: "Google Cloud Skills",
+    earned: "October 2025",
+    image: "/Badges/introduction-to-generative-ai.png",
+    verify: "https://www.skills.google/public_profiles/7a99097a-b7db-4477-8572-6383dd322757/badges/19232480",
+  },
+  {
+    title: "Encoder-Decoder Architecture",
+    issuer: "Google Cloud Skills",
+    earned: "October 2025",
+    image: "/Badges/encoder-decoder-architecture.png",
+    verify: "https://www.skills.google/public_profiles/7a99097a-b7db-4477-8572-6383dd322757/badges/19233619",
+  },
+  {
+    title: "Digital IC Design Fundamentals v2.0 Exam",
+    issuer: "Cadence Design Systems",
+    earned: "September 2026",
+    image: "/Badges/cadence-digital-ic-design-fundamentals.png",
+    verify: "https://www.credly.com/badges/2d627dcf-0976-439a-803e-6d218ec99fde/public_url",
+  },
+  {
+    title: "Semiconductor 101 v1.0 Exam",
+    issuer: "Cadence Design Systems",
+    earned: "September 2026",
+    image: "/Badges/cadence-semiconductor-101.png",
+    verify: "https://www.credly.com/badges/0e4857bc-0a80-47f0-a478-f82716a40390/public_url",
+  },
+];
+
 export const marqueeText =
   "VLSI · RTL DESIGN · CHIP DESIGN · VERILOG · CMOS · DIGITAL LOGIC · COMPUTER ARCHITECTURE · ASIC DESIGN · VERIFICATION · ";
 

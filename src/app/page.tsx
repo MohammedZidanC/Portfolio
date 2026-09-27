@@ -17,6 +17,7 @@ import Skills         from '@/components/sections/Skills';
 import Education      from '@/components/sections/Education';
 import Projects       from '@/components/sections/Projects';
 import Certifications from '@/components/sections/Certifications';
+import Badges         from '@/components/sections/Badges';
 import Contact        from '@/components/sections/Contact';
 import Footer         from '@/components/sections/Footer';
 
@@ -30,6 +31,7 @@ const NAV_SECTIONS = [
   { id: 'education',      label: 'Education' },
   { id: 'projects',       label: 'Projects' },
   { id: 'certifications', label: 'Certifications' },
+  { id: 'badges',         label: 'Badges' },
   { id: 'contact',        label: 'Contact' },
 ];
 
@@ -72,6 +74,7 @@ export default function HomePage() {
           <Education />
           <Projects />
           <Certifications />
+          <Badges />
           <Contact />
         </main>
         <Footer />

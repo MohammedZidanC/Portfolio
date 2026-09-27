@@ -81,6 +81,28 @@ h1, h2, h3, h4 {
   margin: 0 auto;
 }
 
+.badge-card {
+  min-height: 184px;
+  border-color: var(--border);
+  background: rgba(20, 19, 17, 0.82);
+}
+.badge-card:hover {
+  border-color: rgba(198, 167, 121, 0.38);
+  background: rgba(198, 167, 121, 0.045);
+  box-shadow: 0 14px 42px rgba(0, 0, 0, 0.16), 0 0 24px rgba(198, 167, 121, 0.06);
+  transform: translateY(-2px);
+}
+.badge-artwork {
+  width: 144px;
+  height: 144px;
+  border: 1px solid rgba(241, 239, 233, 0.18);
+  background: #f4f1e9;
+}
+@media (max-width: 640px) {
+  .badge-card { min-height: 132px; gap: 1rem; }
+  .badge-artwork { width: 104px; height: 104px; }
+}
+
 @media (max-width: 768px) {
   .section-wrapper { padding: 80px 1.25rem; }
 }

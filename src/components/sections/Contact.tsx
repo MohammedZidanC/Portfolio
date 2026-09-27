@@ -36,7 +36,7 @@ export default function Contact() {
       <AuroraBlobs variant="contact" />
 
       <div className="section-wrapper relative z-10 text-center">
-        <SectionNumber number="06" />
+        <SectionNumber number="07" />
 
         <div className="mb-10">
           <p
